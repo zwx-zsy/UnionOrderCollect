@@ -1,85 +1,104 @@
 package lib
 
 import (
-	"github.com/yancyzhou/unionsdk/JdunionSdk"
+	"github.com/yancyzhou/JdunionSdk"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 )
 
 const (
-	CONFPATH string = "DockerBuild/configuration/conf.yaml"
+	CONFPATH string = "/Users/Vincent/workspace/UnionOrderCollect/DockerBuild/configuration/conf.yaml"
 )
 
 //start
 type Yaml struct {
-	ConfigKey    string       `yaml:"ConfigKey"`
-	DBConf       MongoDB      `yaml:"mongodb"`
-	RedisConn    string       `yaml:"redisConn"`
-	JwtConf      JwtConf      `yaml:"JwtConf"`
-	WeChat       WeChats      `yaml:"wechat"`
-	Server       Server       `yaml:"Server"`
-	AliAccessKey AliAccessKey `yaml:"AliAccessKey"`
-	AliPayConf   AliPayConf   `yaml:"AliPayConf"`
-	WxPayConf    WxPayConf    `yaml:"WxPayConf"`
-	JDConfig     JDConfig     `yaml:"JDConfig"`
-}
-
-type AliPayConf struct {
-	APPID        string `yaml:"APPID"`
-	ALIPUBLICKEY string `yaml:"ALIPUBLICKEY"`
-	PRIVATEKEY   string `yaml:"PRIVATEKEY"`
-	IsPruduction bool   `yaml:"IsPruduction"`
+	DBConf        MongoDB      `yaml:"Mongodb"`
+	RedisConf     Redis        `yaml:"Redis"`
+	JwtConf       JwtConf      `yaml:"JwtConf"`
+	WeChat        WeChats      `yaml:"Wechat"`
+	Server        Server       `yaml:"Server"`
+	AliAccessKey  AliAccessKey `yaml:"AliAccessKey"`
+	AliPayConf    AliPayConf   `yaml:"AliPayConf"`
+	WXPayConf     WXPayConf    `yaml:"WXPayConf"`
+	AliOssConf    AliOssConf   `yaml:"AliOss"`
+	TimeLayoutStr string       `yaml:"TimeLayoutStr"`
+	JDConfig      JDConfig     `yaml:"JDConfig"`
 }
 
 type Server struct {
-	Host string `yaml:"Host"`
-	Port string `yaml:"Port"`
+	Host string `yaml:"host"`
+	Port string `yaml:"port"`
 }
+type MongoDB struct {
+	User         string `yaml:"user"`
+	Host         string `yaml:"host"`
+	Password     string `yaml:"passWord"`
+	Port         string `yaml:"port"`
+	DatabaseName string `yaml:"databaseName"`
+	AuthDBName   string `yaml:"authName"`
+	Uri          string `yaml:"url"`
+}
+type Redis struct {
+	Host                       string `yaml:"host"`
+	PassWord                   string `yaml:"passWord"`
+	Port                       string `yaml:"port"`
+	DatabaseName               int    `yaml:"db"`
+	VerificationRedisKeyPrefix string `json:"verificationRedisKeyPrefix"`
+}
+
+type JwtConf struct {
+	IsSuer    string `yaml:"issuer"`
+	ExpTime   int64  `yaml:"expTime"`
+	NotBefore int64  `yaml:"notBefore"`
+}
+
 type JDConfig struct {
 	AppSecret string `yaml:"appSecret"`
 	AppKey    string `yaml:"appKey"`
 }
-type MongoDB struct {
-	User         string `yaml:"db_user"`
-	Host         string `yaml:"db_host"`
-	Password     string `yaml:"db_pass"`
-	Port         string `yaml:"db_port"`
-	DatabaseName string `yaml:"db_database_name"`
-	AuthDBName   string `yaml:"db_auth_name"`
-	Uri          string `yaml:"url"`
-}
 
-type JwtConf struct {
-	Issuer    string `yaml:"issuer"`
-	Exptime   int64  `yaml:"exptime"`
-	Notbefore int64  `yaml:"notbefore"`
-}
-
+//微信资源配置
 type WeChats struct {
-	APPID     string `yaml:"APPID"`
-	APPSECRET string `yaml:"APPSECRET"`
+	AppID     string `yaml:"appID"`
+	AppSecret string `yaml:"appSecret"`
 }
 
-type WxPayConf struct {
-	APPID     string `yaml:"APPID"`
-	APPSECRET string `yaml:"APPSECRET"`
-	MCHID     string `yaml:"MCHID"`
-	APPKEY    string `yaml:"APPKEY"`
+type WXPayConf struct {
+	AppID     string `yaml:"appID"`
+	MchID     string `yaml:"mchID"`
+	WXPApiKey string `yaml:"wxPApiKey"`
 }
 
+//阿里资源配置
 type AliAccessKey struct {
-	AccessKeyID     string `yaml:"AccessKeyID"`
-	AccessKeySecret string `yaml:"AccessKeySecret"`
-	AliYunDomain    string `yaml:"AliYunDomain"`
-	SmsVersion      string `yaml:"SmsVersion"`
-	SmsTemplateCode string `yaml:"SmsTemplateCode"`
-	SmsSignName     string `yaml:"SmsSignName"`
-	SmsRegionId     string `yaml:"SmsRegionId"`
+	AccessKeyID     string `yaml:"accessKeyID"`
+	AccessKeySecret string `yaml:"accessKeySecret"`
+	AliYunDomain    string `yaml:"aliYunDomain"`
+	SmsVersion      string `yaml:"smsVersion"`
+	SmsTemplateCode string `yaml:"smsTemplateCode"`
+	SmsSignName     string `yaml:"smsSignName"`
+	SmsRegionId     string `yaml:"smsRegionId"`
+}
+
+type AliPayConf struct {
+	AppID        string `yaml:"appID"`
+	AliPublicKey string `yaml:"aliPublicKey"`
+	PrivateKey   string `yaml:"privateKey"`
+	IsProduction bool   `yaml:"isProduction"`
+}
+
+type AliOssConf struct {
+	AccessKeyID     string `yaml:"ossAccessKeyID"`
+	AccessKeySecret string `yaml:"ossAccessKeySecret"`
+	Bucket          string `yaml:"ossBucket"`
+	EndPoint        string `yaml:"ossEndPoint"`
+	CallBackHost    string `yaml:"ossCallBackHost"`
 }
 
 var ServerConf *Yaml
 var J JdunionSdk.JdSdk
+
 func init() {
 	yamlFile, err := ioutil.ReadFile(CONFPATH)
 	if err != nil {
